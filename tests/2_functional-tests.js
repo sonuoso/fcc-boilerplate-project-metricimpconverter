@@ -6,58 +6,63 @@ const server = require("../server");
 chai.use(chaiHttp);
 
 suite("Functional Tests", function () {
+  //#1
   test("Convert a valid input such as 10L", function (done) {
     chai
       .request(server)
       .keepOpen()
       .get("/api/convert?input=10L")
       .end(function (err, res) {
-        assert.isAtLeast(res.data.returnNum, 2.64172176858);
-        assert.equal(res.data.returnUnit, "gal");
+        assert.isAtLeast(res.body.returnNum, 2.64172);
+        assert.equal(res.body.returnUnit, "gal");
         done();
       });
   });
 
+  //#2
   test("Convert an invalid input such as 32g", function (done) {
     chai
       .request(server)
       .keepOpen()
       .get("/api/convert?input=32g")
       .end(function (err, res) {
-        assert.equal(err, "invalid unit");
+        assert.equal(res.text, "invalid unit");
         done();
       });
   });
 
+  //#3
   test("Convert an invalid number such as 3/7.2/4kg", function (done) {
     chai
       .request(server)
       .keepOpen()
       .get("/api/convert?input=3/7.2/4kg")
       .end(function (err, res) {
-        assert.equal(err, "invalid number");
+        assert.equal(res.text, "invalid number");
         done();
       });
   });
 
+  //#4
   test("Convert an invalid number AND unit such as 3/7.2/4kilomegagram", function (done) {
     chai
       .request(server)
       .keepOpen()
       .get("/api/convert?input=3/7.2/4kilomegagram")
       .end(function (err, res) {
-        assert.equal(err, "invalid number and unit");
+        assert.equal(res.text, "invalid number and unit");
         done();
       });
   });
 
+  //#5
   test("Convert with no number such as kg", function (done) {
     chai
       .request(server)
       .keepOpen()
       .get("/api/convert?input=kg")
       .end(function (err, res) {
-        assert.atLeast(res.data.returnNum, 1 / 0.453592);
+        assert.isAtLeast(res.body.returnNum, 2.20462);
         done();
       });
   });
